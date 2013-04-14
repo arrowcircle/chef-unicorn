@@ -1,0 +1,85 @@
+#!/bin/sh
+# BEGIN INIT INFO
+# Provides:          unicorn
+# Required-Start:    $remote_fs $syslog
+# Required-Stop:     $remote_fs $syslog
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Manage unicorn server
+# Description:       Start, stop, restart unicorn server for a specific application.
+### END INIT INFO
+set -e
+
+# Feel free to change any of the following variables for your app:
+TIMEOUT=${TIMEOUT-60}
+APP_ROOT=/home/<%= node['users']['user'] %>/projects/<%= node["app_name"] %>/current
+PID=/home/<%= node['users']['user'] %>/projects/<%= node["app_name"] %>/shared/pids/sidekiq.pid
+LOG_FILE=$APP_ROOT/log/sidekiq.log
+CMD="cd /home/<%= node['users']['user'] %>/projects/<%= node["app_name"] %>/current; RAILS_ENV=production bundle exec sidekiq -C config/sidekiq.yml >> $LOG_FILE 2>&1 &"
+AS_USER=<%= node['users']['user'] %>
+set -u
+
+OLD_PIN="$PID.oldbin"
+
+sig () {
+  test -s "$PID" && kill -s $1 `cat $PID`
+}
+
+oldsig () {
+  test -s $OLD_PIN && kill -$1 `cat $OLD_PIN`
+}
+
+run () {
+  if [ "$(id -un)" = "$AS_USER" ]; then
+    eval $1
+  else
+    su -c "$1" - $AS_USER
+  fi
+}
+
+start () {
+  sig 0 && echo >&2 "Already running" && exit 0
+  run "$CMD"
+}
+
+stop () {
+  echo "Stopping SIDEKIQ message processor .."
+  SIG="INT"
+  kill -s $SIG `cat  $PID`
+  RETVAL=$?
+  [ $RETVAL -eq 0 ]
+  return $RETVAL
+}
+
+status() {
+  ps -ef | grep 'sidekiq [0-9].[0-9].[0-9]' | grep -v grep
+  return $?
+}
+
+case "$1" in
+start)
+  start
+  ;;
+stop)
+  stop
+  ;;
+restart)
+  stop
+  start
+  ;;
+status)
+  status
+
+  if [ $? -eq 0 ]; then
+       echo "SIDEKIQ message processor is running .."
+       RETVAL=0
+   else
+       echo "SIDEKIQ message processor is stopped .."
+       RETVAL=1
+   fi
+  ;;
+*)
+  echo >&2 "Usage: $0 <start|stop|restart|status>"
+  exit 1
+  ;;
+esac

@@ -12,10 +12,10 @@ set -e
 
 # Feel free to change any of the following variables for your app:
 TIMEOUT=${TIMEOUT-60}
-APP_ROOT=/home/<%= node['users']['user'] %>/projects/<%= node["app_name"] %>/current
-PID=/home/<%= node['users']['user'] %>/projects/<%= node["app_name"] %>/shared/pids/sidekiq.pid
+APP_ROOT=/home/<%= node['users']['user'] %>/projects/<%= node['app_name'] %>/current
+PID=/home/<%= node['users']['user'] %>/projects/<%= node['app_name'] %>/shared/pids/sidekiq.pid
 LOG_FILE=$APP_ROOT/log/sidekiq.log
-CMD="cd /home/<%= node['users']['user'] %>/projects/<%= node["app_name"] %>/current; RAILS_ENV=production bundle exec sidekiq -C config/sidekiq.yml >> $LOG_FILE 2>&1 &"
+CMD="cd /home/<%= node['users']['user'] %>/projects/<%= node['app_name'] %>/current; RAILS_ENV=production bundle exec sidekiq -C config/sidekiq.yml >> $LOG_FILE 2>&1 &"
 AS_USER=<%= node['users']['user'] %>
 set -u
 

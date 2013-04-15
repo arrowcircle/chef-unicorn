@@ -4,7 +4,7 @@ working_directory "#{app_folder}/current"
 
 preload_app true
 
-timeout <%= node["unicorn"]["timeout"] %>
+timeout <%= node['unicorn']['timeout'] %>
 
 listen "#{app_folder}/shared/unicorn.sock", :backlog => 64
 

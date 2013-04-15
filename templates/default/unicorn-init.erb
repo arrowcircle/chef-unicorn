@@ -12,9 +12,9 @@ set -e
 
 # Feel free to change any of the following variables for your app:
 TIMEOUT=${TIMEOUT-60}
-APP_ROOT=/home/<%= node["users"]["user"] %>/projects/<%= node["app_name"] %>/current
-PID=/home/<%= node['users']['user'] %>/projects/<%= node["app_name"] %>/shared/pids/unicorn.pid
-CMD="cd /home/<%= node['users']['user'] %>/projects/<%= node["app_name"] %>/current; bundle exec unicorn_rails -D -c /home/<%= node['users']['user'] %>/projects/<%= node["app_name"] %>/shared/config/unicorn.rb -E production"
+APP_ROOT=/home/<%= node['users']['user'] %>/projects/<%= node['app_name'] %>/current
+PID=/home/<%= node['users']['user'] %>/projects/<%= node['app_name'] %>/shared/pids/unicorn.pid
+CMD="cd /home/<%= node['users']['user'] %>/projects/<%= node['app_name'] %>/current; bundle exec unicorn_rails -D -c /home/<%= node['users']['user'] %>/projects/<%= node['app_name'] %>/shared/config/unicorn.rb -E production"
 AS_USER=<%= node['users']['user'] %>
 set -u
 

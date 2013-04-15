@@ -1,5 +1,5 @@
 upstream <%= node['app_name'] %> {
-  server unix:/home/webmaster/projects/<%= node['app_name'] %>/shared/unicorn.sock fail_timeout=0;
+  server unix:/home/<%= node['users']['user'] %>/projects/<%= node['app_name'] %>/shared/unicorn.sock fail_timeout=0;
 }
 
 server {
@@ -10,7 +10,7 @@ server {
 server {
   listen 80 default deferred;
   server_name <%= node['domain_name'] %>;
-  root /home/webmaster/projects/<%= node['app_name'] %>/current/public;
+  root /home/<%= node['users']['user'] %>/projects/<%= node['app_name'] %>/current/public;
 
   location ^~ /assets/ {
     gzip_static on;
@@ -18,8 +18,9 @@ server {
     add_header Cache-Control public;
   }
 
-  try_files $uri/index.html $uri @unicorn;
-  location @unicorn {
+  try_files $uri/index.html $uri @<%= node['app_name'] %>;
+
+  location @<%= node['app_name'] %> {
     proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
     proxy_set_header Host $http_host;
     proxy_redirect off;
